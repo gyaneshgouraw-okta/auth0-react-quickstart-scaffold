@@ -8,11 +8,13 @@ const prompts = require('prompts');
 async function main() {
   try {
     const projectDetails = await getProjectDetails();
-    const targetDir = path.join(process.cwd(), projectDetails);
+    console.log("[details]1", projectDetails)
+    const { name, domain, clientId } = projectDetails;
+    const targetDir = path.join(process.cwd(), projectDetails.name);
     fs.mkdirSync(targetDir);
 
     const templateDir = path.join(__dirname, 'templates');
-    copyTemplateFiles(templateDir, targetDir, projectDetails.name);
+    copyTemplateFiles(templateDir, targetDir, name, domain, clientId);
 
     console.log(`Boilerplate project created successfully in ${targetDir}`);
   } catch (err) {
@@ -20,7 +22,8 @@ async function main() {
   }
 }
 
-function copyTemplateFiles(source, destination, projectDetails) {
+function copyTemplateFiles(source, destination, projectName, domain, clientId) {
+  // console.log("[details]2", projectName, domain, clientId)
   if (!fs.existsSync(destination)) {
     fs.mkdirSync(destination, { recursive: true });
   }
@@ -31,12 +34,12 @@ function copyTemplateFiles(source, destination, projectDetails) {
 
     if (fs.statSync(sourcePath).isDirectory()) {
       // Recursively handle directories
-      copyTemplateFiles(sourcePath, destPath, projectDetails.name);
+      copyTemplateFiles(sourcePath, destPath, projectName, domain, clientId);
     } else {
       // Handle file copying and replacement
       let content = fs.readFileSync(sourcePath, 'utf8');
-      content = content.replace(/{DOMAIN}/g, projectDetails.domain);
-      content = content.replace(/{CLIENT_ID}/g, projectDetails.clientId);
+      content = content.replace(/{DOMAIN}/g, domain);
+      content = content.replace(/{CLIENT_ID}/g, clientId);
       fs.writeFileSync(destPath, content, 'utf8');
     }
   });
@@ -51,9 +54,9 @@ function getCliArguments() {
 }
 
 async function getUserPrompts() {
-  const response = await prompts({
+  const response = await prompts([{
     type: 'text',
-    name: 'projectName',
+    name: 'name',
     message: 'What should be your project name?',
   },
   {
@@ -65,8 +68,8 @@ async function getUserPrompts() {
     type: 'text',
     name: 'clientId',
     message: 'What is your client name?',
-  }
-);
+  }]
+  );
   return response
 }
 
