@@ -7,12 +7,12 @@ const prompts = require('prompts');
 
 async function main() {
   try {
-    const projectName = await getProjectName();
-    const targetDir = path.join(process.cwd(), projectName);
+    const projectDetails = await getProjectDetails();
+    const targetDir = path.join(process.cwd(), projectDetails);
     fs.mkdirSync(targetDir);
 
     const templateDir = path.join(__dirname, 'templates');
-    copyTemplateFiles(templateDir, targetDir, projectName);
+    copyTemplateFiles(templateDir, targetDir, projectDetails.name);
 
     console.log(`Boilerplate project created successfully in ${targetDir}`);
   } catch (err) {
@@ -20,7 +20,7 @@ async function main() {
   }
 }
 
-function copyTemplateFiles(source, destination, projectName) {
+function copyTemplateFiles(source, destination, projectDetails) {
   if (!fs.existsSync(destination)) {
     fs.mkdirSync(destination, { recursive: true });
   }
@@ -31,11 +31,12 @@ function copyTemplateFiles(source, destination, projectName) {
 
     if (fs.statSync(sourcePath).isDirectory()) {
       // Recursively handle directories
-      copyTemplateFiles(sourcePath, destPath, projectName);
+      copyTemplateFiles(sourcePath, destPath, projectDetails.name);
     } else {
       // Handle file copying and replacement
       let content = fs.readFileSync(sourcePath, 'utf8');
-      content = content.replace(/{{ projectName }}/g, projectName);
+      content = content.replace(/{DOMAIN}/g, projectDetails.domain);
+      content = content.replace(/{CLIENT_ID}/g, projectDetails.clientId);
       fs.writeFileSync(destPath, content, 'utf8');
     }
   });
@@ -52,19 +53,30 @@ function getCliArguments() {
 async function getUserPrompts() {
   const response = await prompts({
     type: 'text',
-    name: 'value',
+    name: 'projectName',
     message: 'What should be your project name?',
-  });
+  },
+  {
+    type: 'text',
+    name: 'domain',
+    message: 'What is your domain name?',
+  },
+  {
+    type: 'text',
+    name: 'clientId',
+    message: 'What is your client name?',
+  }
+);
   return response
 }
 
-async function getProjectName() {
+async function getProjectDetails() {
   const cliArgument = getCliArguments();
   if (cliArgument) {
     return cliArgument;
   } else {
     const response = await getUserPrompts();
-    return response.value;;
+    return response;
   }
 }
 
