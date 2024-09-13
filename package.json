@@ -1,5 +1,5 @@
 {
-    "name": "auth0-react-quickstart",
+    "name": "auth0-react-quickstart1",
     "version": "1.0.0",
     "description": "A boilerplate generator",
     "main": "index.js",
@@ -8,7 +8,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/gyaneshgouraw-okta/create-basic-scaffold.git"
+        "url": "https://github.com/gyaneshgouraw-okta/auth0-react-quickstart-scaffold"
     },
     "scripts": {
         "start": "node index.js"
