@@ -7,3 +7,12 @@ Simple repo to publish a scafolding app
 
 - npm login
 - npm publish
+
+# NPM 
+https://www.npmjs.com/package/auth0-react-quickstart1
+
+# Executable command
+
+``` 
+npx auth0-react-quickstart1
+```
